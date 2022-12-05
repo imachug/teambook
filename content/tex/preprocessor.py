@@ -220,10 +220,22 @@ def print_header(data, outstream):
     ind = lines.index(until) + 1
     header_length = len("".join(lines[:ind]))
     def adjust(name):
-        return name if name.startswith('.') else name.split('.')[0]
+        name = name if name.startswith('.') else name.split('.')[0]
+        if header_length > 90 and name.lower() != name:
+            words = []
+            for c in name:
+                if c.islower() and words:
+                    words[-1] += c
+                else:
+                    words.append(c)
+            if len(words) > 1:
+                shortened_name = "".join(word[:4] for word in words)
+                if len(shortened_name) < len(name) - 2:
+                    name = shortened_name + ".."
+        return name
     output = r"\enspace{}".join(map(adjust, lines[:ind]))
     font_size = 10
-    if header_length > 150:
+    if header_length > 90:
         font_size = 8
     output = r"\hspace{3mm}\textbf{" + output + "}"
     output = "\\fontsize{%d}{%d}" % (font_size, font_size) + output
